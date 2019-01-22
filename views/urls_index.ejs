@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>TinyApp</title>
+  </head>
+  <body>
+    <h1>List of URLs</h1>
+      <% include partials/_header %>
+
+    <ul>
+      <% if(user) { %>
+        <% for (let urlsId in urls) { %>
+          <li>
+            <%= urlsId %> <a href= <%= urls[urlsId].longURL %>><%= urls[urlsId].longURL %></a>
+          <a href="/urls/<%= urlsId %>">Edit</a>
+          </li>
+          <form method="POST" action="/urls/<%= urlsId %>/delete">
+            <button type="submit" value="delete">Delete</button>
+            <div>
+            </div>
+          </form>
+        <% } %>
+      <% } else { %>
+        <h2>Please login or register</h2>
+        <% } %>
+    </ul>
+    <a href="/urls/new">Create new link</a>
+  </body>
+</html>

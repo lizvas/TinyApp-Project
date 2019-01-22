@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <header>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <h1>Tiny App</h1>
+    <% if (user) { %>
+    <div>Welcome <%= user.email %></div>
+    <div>
+      <form method="post" action="/logout">
+        <input type ="submit" value="Logout">
+      </form>
+    </div>
+    <% } else { %>
+
+      <div class="session-links">
+        <div class="login">
+          <a href="/login">Login</a>
+      </div>
+
+      <div>
+      <a href="/register">Register</a>
+      </div>
+      </div>
+      <% } %>
+</html>
