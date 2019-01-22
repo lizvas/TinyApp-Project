@@ -13,10 +13,10 @@ app.use(
     keys: ["key1", "key2"]
   })
 );
-// app.use(cookieParser());
 
 app.set("view engine", "ejs");
 
+//modified urlDB that connects users to urls
 const urlDatabase = {
   b2xVn2: {
     shortURL: "b2xVn2",
@@ -31,6 +31,7 @@ const urlDatabase = {
   }
 };
 
+//current users
 const users = {
   userRandomID: {
     id: "userRandomID",
@@ -47,6 +48,9 @@ const users = {
 const createUser = (email, password) => {
   const userId = generateRandomString();
 
+  //formate for newUser when they register; we want
+  //email and passowrd; password will be generated through
+  //generateRandomString
   const newUser = {
     id: userId,
     email: email,
@@ -78,10 +82,12 @@ function urlsForUser(id) {
   return filteredUrls;
 }
 
+//generates random string for users and short urls
 function generateRandomString() {
   return uuidv4().substr(0, 6);
 }
 
+//when we want to verify user
 const emailExist = email => {
   for (const userId in users) {
     if (users[userId].email === email) {
@@ -92,6 +98,9 @@ const emailExist = email => {
 };
 
 //List of all the endpoints
+//app.post shows a feature to the user
+//app.get is an action we want to do...like update
+//delete modify
 app.post("/urls", (req, res) => {
   const longURL = req.body.longURL;
   let shortURL = generateRandomString();
@@ -126,7 +135,8 @@ app.get("/urls", (req, res) => {
   let currentUser = users[userId];
   //communicating the filtered version of userDatabase for the currently
   //logged in user
-
+  //checking if person is currentuser with their personal urls
+  //if not they will get urlDatabase
   let templateVars = {
     urls: currentUser ? urlsForUser(userId) : urlDatabase,
     user: users[req.session.user_id]
@@ -136,15 +146,12 @@ app.get("/urls", (req, res) => {
 
 app.post("/login", (req, res) => {
   const lEmail = req.body.email;
-  // const lpassword = req.body.password;
-  // console.log("password", lpassword);
   const hashedPassword = bcrypt.hashSync(req.body.password, 10);
   for (var lUser in users) {
     if (
       users[lUser].email === lEmail &&
       users[lUser].password === req.body.password
     ) {
-      // res.cookie("user_id", users[lUser].id);
       req.session.user_id = users[lUser].id;
       res.redirect("/urls/");
       return;
@@ -152,14 +159,6 @@ app.post("/login", (req, res) => {
   }
   res.send("Wrong email or password!");
 });
-// const email_password_empty = !email || !password;
-
-//   if (email_password_empty) {
-//     res.status(400).send("Please send out the required fields");
-//   } else if (!emailExist(email)) {
-//     res.status(400).send("User already exists. Please login!");
-//   } else {
-//     const userId = createUser(email, password);
 
 app.get("/urls/new", (req, res) => {
   let usernameFromCookie = req.session["user_id"];
@@ -167,7 +166,6 @@ app.get("/urls/new", (req, res) => {
   if (!templateVars) {
     res.redirect("/login");
   }
-
   res.render("urls_new", templateVars);
 });
 
@@ -202,27 +200,28 @@ app.post("/urls/:id/update", (req, res) => {
   res.redirect("/urls");
 });
 
+//req.session will destroy cookies
 app.post("/logout", (req, res) => {
   req.session = null;
-  // res.clearCookie("user_id");
   res.redirect("/urls");
 });
+
 app.get("/logout", (req, res) => {
   res.clearCookie("user_id");
   res.send("Cookie deleted");
   res.redirect("/urls");
 });
 
+//email and password from register form will be passed
+//through req.body
 app.post("/register", (req, res) => {
-  // let randomId = generateRandomString();
-  // users[randomId] =
-  //   id: randomId,
   const email = req.body.email;
   const password = req.body.password;
+  //encrypt password that user fills out in form
   const hashedPassword = bcrypt.hashSync(req.body.password, 10);
   console.log("hashedPassword", hashedPassword);
   const email_password_empty = !email || !password;
-
+  //conditional for empty fields
   if (email_password_empty) {
     res.status(400).send("Please send out the required fields");
   } else if (emailExist(email)) {
